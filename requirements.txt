@@ -1,0 +1,12 @@
+flask==2.3.3
+flask-cors==4.0.0
+yt-dlp==2023.11.16
+requests==2.31.0
+pillow==10.0.1
+numpy==1.24.3
+opencv-python-headless==4.8.1.78
+speechrecognition==3.10.0
+pydub==0.25.1
+torch==2.0.1
+torchvision==0.15.2
+transformers==4.35.2
