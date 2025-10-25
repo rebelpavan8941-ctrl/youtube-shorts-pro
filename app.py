@@ -518,8 +518,21 @@ class YouTubeShortsGenerator:
         return None
     
     def get_video_info(self, video_url):
-        """Get video information"""
-        ydl_opts = {'quiet': True, 'no_warnings': True}
+        """Get video information - UPDATED TO FIX BOT DETECTION"""
+        ydl_opts = {
+            'quiet': True, 
+            'no_warnings': True,
+            'extract_flat': False,
+            'cookiefile': None,
+            'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'http_headers': {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Accept-Language': 'en-us,en;q=0.5',
+                'Accept-Encoding': 'gzip,deflate',
+                'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
+            }
+        }
         try:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info = ydl.extract_info(video_url, download=False)
@@ -537,11 +550,22 @@ class YouTubeShortsGenerator:
             return {'success': False, 'error': str(e)}
     
     def download_video(self, video_url, output_path):
-        """Download YouTube video in HIGH QUALITY"""
+        """Download YouTube video in HIGH QUALITY - UPDATED TO FIX BOT DETECTION"""
         ydl_opts = {
             'outtmpl': output_path,
             'format': 'best[height<=1080]',
             'quiet': False,
+            'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'extract_flat': False,
+            'cookiefile': None,
+            'http_headers': {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Accept-Language': 'en-us,en;q=0.5',
+                'Accept-Encoding': 'gzip,deflate',
+                'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
+                'Connection': 'keep-alive',
+            }
         }
         
         try:
@@ -606,7 +630,7 @@ class YouTubeShortsGenerator:
                 "hashtags": ai_hashtags,
                 "quality_score": quality_score,
                 "engagement_score": round(quality_score * 10 + random.uniform(0, 5), 1),
-                "virality_potential": f"{min(95, int(quality_score * 10))}%",
+                "virality_petential": f"{min(95, int(quality_score * 10))}%",
                 "category": category,
                 "copyright_status": copyright_analysis['status'],
                 "copyright_score": copyright_analysis['score'],
@@ -1022,6 +1046,7 @@ if __name__ == '__main__':
     print("🚀 YouTube Shorts Pro Server Starting...")
     print("🎯 CONTEXTUAL AI TITLE GENERATION ENABLED")
     print("💾 PERSISTENT SESSION MANAGEMENT ENABLED")
+    print("🛡️  YOUTUBE BOT PROTECTION BYPASS ENABLED")
     
     # Clean up any expired sessions on startup
     session_manager.cleanup_expired_sessions()
