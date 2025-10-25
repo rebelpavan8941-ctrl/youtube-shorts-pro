@@ -88,19 +88,16 @@ class YouTubeShortsGenerator:
         self.print_ffmpeg_status()
     
     def find_ffmpeg(self):
-        """Find FFmpeg in project folder first"""
-        project_ffmpeg = os.path.join(os.getcwd(), 'ffmpeg', 'bin', 'ffmpeg.exe')
-        if os.path.exists(project_ffmpeg):
-            return project_ffmpeg
-        
+        """Find FFmpeg - Render has it built-in"""
         try:
+            # Try system ffmpeg (available on Render)
             result = subprocess.run(['ffmpeg', '-version'], capture_output=True, text=True, timeout=5)
             if result.returncode == 0:
                 return 'ffmpeg'
         except:
             pass
         
-        return None
+        return 'ffmpeg'  # Render has ffmpeg in PATH
     
     def load_video_categories(self):
         """Enhanced video categories with title templates"""
@@ -594,8 +591,8 @@ class YouTubeShortsGenerator:
             
             # Generate contextual AI-powered title and hashtags
             ai_title = self.generate_contextual_title(
-                category, 
-                keywords, 
+                category,
+                keywords,
                 15,  # clip duration
                 start_time,
                 video_info['title']
@@ -1019,22 +1016,14 @@ def cleanup_sessions():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
+# Render-compatible startup
 if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
     print("🚀 YouTube Shorts Pro Server Starting...")
-    print("=" * 50)
     print("🎯 CONTEXTUAL AI TITLE GENERATION ENABLED")
-    print("   → Keyword extraction from video content")
-    print("   → Contextual title generation")
-    print("   → Dynamic hashtag creation")
-    print("   → Video-specific clip titles")
-    print("=" * 50)
     print("💾 PERSISTENT SESSION MANAGEMENT ENABLED")
-    print("   → File-based session storage")
-    print("   → 24-hour session lifetime")
-    print("   → Automatic session cleanup")
-    print("=" * 50)
     
     # Clean up any expired sessions on startup
     session_manager.cleanup_expired_sessions()
     
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=port)
