@@ -24,6 +24,9 @@ CORS(app)
 os.makedirs('downloads', exist_ok=True)
 os.makedirs('sessions', exist_ok=True)
 
+# YouTube Data API Key - YOUR ACTUAL KEY
+YOUTUBE_API_KEY = "AIzaSyCom9SYprD5j2FfAdh_MZPqTBgSV_pcEkQ"
+
 class SessionManager:
     def __init__(self):
         self.sessions_dir = 'sessions'
@@ -90,144 +93,94 @@ class YouTubeShortsGenerator:
     def find_ffmpeg(self):
         """Find FFmpeg - Render has it built-in"""
         try:
-            # Try system ffmpeg (available on Render)
             result = subprocess.run(['ffmpeg', '-version'], capture_output=True, text=True, timeout=5)
             if result.returncode == 0:
                 return 'ffmpeg'
         except:
             pass
-        
-        return 'ffmpeg'  # Render has ffmpeg in PATH
+        return 'ffmpeg'
     
     def load_video_categories(self):
         """Enhanced video categories with title templates"""
         return {
             'gaming': {
                 'templates': [
-                    "{} moment! 🎮",
-                    "Incredible {} gameplay! 🤯",
-                    "{} skills on display! 🔥",
-                    "Epic {} play! ⚡",
-                    "{} mastery! 🏆",
-                    "Unbelievable {} action! 💫",
-                    "{} pro move! 👑",
-                    "Game-changing {} moment! 🚀"
+                    "{} moment! 🎮", "Incredible {} gameplay! 🤯", "{} skills on display! 🔥",
+                    "Epic {} play! ⚡", "{} mastery! 🏆", "Game-changing {} moment! 🚀"
                 ],
                 'hashtags': [
                     "#gaming", "#gameplay", "#gamer", "#videogames", "#twitch", "#streamer",
-                    "#gamingclips", "#gamemoments", "#gamingcommunity", "#gamingvideos"
+                    "#gamingclips", "#gamemoments", "#gamingcommunity"
                 ]
             },
             'music': {
                 'templates': [
-                    "{} vibes! 🎵",
-                    "Amazing {} performance! 🎶",
-                    "{} sounds perfect! ✨",
-                    "Incredible {} talent! 🎧",
-                    "{} magic! 💫",
-                    "Beautiful {} moment! 🌟",
-                    "{} musical genius! 🎹",
-                    "Stunning {} skills! 🥁"
+                    "{} vibes! 🎵", "Amazing {} performance! 🎶", "{} sounds perfect! ✨",
+                    "Incredible {} talent! 🎧", "{} magic! 💫", "{} musical genius! 🎹"
                 ],
                 'hashtags': [
                     "#music", "#song", "#musician", "#musicvideo", "#newmusic", "#musiclover",
-                    "#musicproduction", "#musicianlife", "#musicislife", "#musicmoment"
+                    "#musicproduction", "#musicianlife"
                 ]
             },
             'sports': {
                 'templates': [
-                    "{} action! 🏀",
-                    "Incredible {} move! ⚽",
-                    "{} excellence! 🏈",
-                    "Epic {} moment! 🏆",
-                    "{} skills! ⚡",
-                    "Athletic {} perfection! 💪",
-                    "{} championship moment! 🥇",
-                    "Sports {} brilliance! 🎯"
+                    "{} action! 🏀", "Incredible {} move! ⚽", "{} excellence! 🏈",
+                    "Epic {} moment! 🏆", "{} skills! ⚡", "Sports {} brilliance! 🎯"
                 ],
                 'hashtags': [
-                    "#sports", "#athlete", "#fitness", "#sportsmoments", "#athletics", "#sportshighlights",
-                    "#sportslife", "#sportsvideo", "#sportsaction", "#sportsgram"
+                    "#sports", "#athlete", "#fitness", "#sportsmoments", "#athletics", 
+                    "#sportshighlights", "#sportslife", "#sportsvideo"
                 ]
             },
             'comedy': {
                 'templates': [
-                    "{} funny moment! 😂",
-                    "Hilarious {} clip! 🤣",
-                    "{} comedy gold! 🎭",
-                    "Funny {} moment! 💀",
-                    "{} laughs! 🥳",
-                    "Comedic {} genius! 🤡",
-                    "{} prank success! 🎪",
-                    "LOL {} moment! 😹"
+                    "{} funny moment! 😂", "Hilarious {} clip! 🤣", "{} comedy gold! 🎭",
+                    "Funny {} moment! 💀", "{} laughs! 🥳", "LOL {} moment! 😹"
                 ],
                 'hashtags': [
                     "#comedy", "#funny", "#humor", "#laugh", "#comedyvideo", "#funnymoments",
-                    "#comedyclips", "#humorvideo", "#laughs", "#comedycontent"
+                    "#comedyclips", "#humorvideo"
                 ]
             },
             'education': {
                 'templates': [
-                    "{} knowledge! 🧠",
-                    "Learn {} easily! 📚",
-                    "{} explained! 💎",
-                    "Smart {} tips! 💣",
-                    "{} insights! 🎓",
-                    "Educational {} moment! 📖",
-                    "{} learning hack! 🔍",
-                    "Knowledge {} breakthrough! 💡"
+                    "{} knowledge! 🧠", "Learn {} easily! 📚", "{} explained! 💎",
+                    "Smart {} tips! 💣", "{} insights! 🎓", "Knowledge {} breakthrough! 💡"
                 ],
                 'hashtags': [
                     "#education", "#learning", "#knowledge", "#educational", "#learn", "#study",
-                    "#educationmatters", "#learningvideos", "#knowledgeispower", "#educationalcontent"
+                    "#educationmatters", "#learningvideos"
                 ]
             },
             'cooking': {
                 'templates': [
-                    "{} recipe! 👨‍🍳",
-                    "Delicious {} making! 🍳",
-                    "{} cooking magic! 🍲",
-                    "Amazing {} dish! 🍕",
-                    "{} kitchen skills! 🔪",
-                    "Culinary {} perfection! 🍽️",
-                    "{} cooking mastery! 🧑‍🍳",
-                    "Recipe {} success! 🥘"
+                    "{} recipe! 👨‍🍳", "Delicious {} making! 🍳", "{} cooking magic! 🍲",
+                    "Amazing {} dish! 🍕", "{} kitchen skills! 🔪", "Recipe {} success! 🥘"
                 ],
                 'hashtags': [
                     "#cooking", "#food", "#recipe", "#cook", "#foodie", "#cookingvideo",
-                    "#foodlover", "#cookingtips", "#foodporn", "#cookingathome"
+                    "#foodlover", "#cookingtips"
                 ]
             },
             'tech': {
                 'templates': [
-                    "{} tech review! 💻",
-                    "Amazing {} gadget! 📱",
-                    "{} technology! 🔧",
-                    "Innovative {} device! 🚀",
-                    "{} tech insights! ⚡",
-                    "Tech {} breakthrough! 🔬",
-                    "{} gadget magic! ⌚",
-                    "Future {} technology! 🌐"
+                    "{} tech review! 💻", "Amazing {} gadget! 📱", "{} technology! 🔧",
+                    "Innovative {} device! 🚀", "{} tech insights! ⚡", "Future {} technology! 🌐"
                 ],
                 'hashtags': [
                     "#tech", "#technology", "#gadget", "#innovation", "#techie", "#techreview",
-                    "#technews", "#gadgets", "#techvideo", "#technologynews"
+                    "#technews", "#gadgets"
                 ]
             },
             'general': {
                 'templates': [
-                    "{} moment! 🤯",
-                    "Incredible {} clip! 🚀",
-                    "{} awesomeness! 🔥",
-                    "Epic {} content! 💫",
-                    "{} viral moment! 📈",
-                    "Mind-blowing {}! 🌟",
-                    "{} perfection! ✨",
-                    "Must-see {}! 👀"
+                    "{} moment! 🤯", "Incredible {} clip! 🚀", "{} awesomeness! 🔥",
+                    "Epic {} content! 💫", "{} viral moment! 📈", "Must-see {}! 👀"
                 ],
                 'hashtags': [
                     "#viral", "#trending", "#shorts", "#fyp", "#youtubeshorts", "#content",
-                    "#viraltiktok", "#trendingnow", "#shortsvideo", "#foryou"
+                    "#viraltiktok", "#trendingnow"
                 ]
             }
         }
@@ -517,20 +470,77 @@ class YouTubeShortsGenerator:
                 return match.group(1)
         return None
     
-    def get_video_info(self, video_url):
-        """Get video information - UPDATED TO FIX BOT DETECTION"""
+    def get_video_info_api(self, video_url):
+        """Get video information using YouTube Data API"""
+        try:
+            video_id = self.extract_video_id(video_url)
+            if not video_id:
+                return {'success': False, 'error': 'Invalid YouTube URL'}
+            
+            # YouTube Data API request
+            api_url = f"https://www.googleapis.com/youtube/v3/videos"
+            params = {
+                'part': 'snippet,contentDetails,statistics',
+                'id': video_id,
+                'key': YOUTUBE_API_KEY
+            }
+            
+            response = requests.get(api_url, params=params, timeout=10)
+            data = response.json()
+            
+            if 'items' not in data or len(data['items']) == 0:
+                return {'success': False, 'error': 'Video not found or API quota exceeded'}
+            
+            item = data['items'][0]
+            snippet = item['snippet']
+            statistics = item.get('statistics', {})
+            content_details = item.get('contentDetails', {})
+            
+            # Parse duration (ISO 8601 format)
+            duration_str = content_details.get('duration', 'PT0M0S')
+            duration_seconds = self.parse_duration(duration_str)
+            
+            return {
+                'success': True,
+                'title': snippet.get('title', 'Unknown Video'),
+                'duration': duration_seconds,
+                'thumbnail': snippet.get('thumbnails', {}).get('high', {}).get('url', ''),
+                'description': snippet.get('description', ''),
+                'view_count': int(statistics.get('viewCount', 0)),
+                'uploader': snippet.get('channelTitle', 'Unknown'),
+                'video_id': video_id,
+            }
+            
+        except Exception as e:
+            return {'success': False, 'error': f'API request failed: {str(e)}'}
+    
+    def parse_duration(self, duration_str):
+        """Parse ISO 8601 duration to seconds"""
+        # Example: PT1H30M15S -> 1 hour, 30 minutes, 15 seconds
+        match = re.match(r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?', duration_str)
+        if not match:
+            return 0
+        
+        hours = int(match.group(1) or 0)
+        minutes = int(match.group(2) or 0)
+        seconds = int(match.group(3) or 0)
+        
+        return hours * 3600 + minutes * 60 + seconds
+    
+    def get_video_info_fallback(self, video_url):
+        """Fallback method with aggressive anti-bot measures"""
         ydl_opts = {
-            'quiet': True, 
+            'quiet': True,
             'no_warnings': True,
             'extract_flat': False,
             'cookiefile': None,
             'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             'http_headers': {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'Accept-Language': 'en-us,en;q=0.5',
-                'Accept-Encoding': 'gzip,deflate',
-                'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
+                'Accept-Language': 'en-US,en;q=0.5',
+                'Accept-Encoding': 'gzip, deflate',
+                'Connection': 'keep-alive',
             }
         }
         try:
@@ -549,41 +559,18 @@ class YouTubeShortsGenerator:
         except Exception as e:
             return {'success': False, 'error': str(e)}
     
-    def download_video(self, video_url, output_path):
-        """Download YouTube video in HIGH QUALITY - UPDATED TO FIX BOT DETECTION"""
-        ydl_opts = {
-            'outtmpl': output_path,
-            'format': 'best[height<=1080]',
-            'quiet': False,
-            'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'extract_flat': False,
-            'cookiefile': None,
-            'http_headers': {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'Accept-Language': 'en-us,en;q=0.5',
-                'Accept-Encoding': 'gzip,deflate',
-                'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
-                'Connection': 'keep-alive',
-            }
-        }
+    def get_video_info(self, video_url):
+        """Get video info with fallback methods"""
+        # Try YouTube API first
+        print("🔍 Getting video info via YouTube API...")
+        api_result = self.get_video_info_api(video_url)
+        if api_result['success']:
+            print("✅ Video info obtained via YouTube API")
+            return api_result
         
-        try:
-            print(f"📥 Downloading source video...")
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                ydl.download([video_url])
-            
-            if os.path.exists(output_path) and os.path.getsize(output_path) > 1024:
-                file_size = os.path.getsize(output_path) / (1024*1024)
-                print(f"✅ Download successful: {file_size:.2f} MB")
-                return True
-            else:
-                print("❌ Download failed: File too small or missing")
-                return False
-                
-        except Exception as e:
-            print(f"❌ Download error: {e}")
-            return False
+        # Fallback to yt-dlp with anti-bot measures
+        print("🔄 API failed, trying fallback method...")
+        return self.get_video_info_fallback(video_url)
     
     def analyze_video_content(self, video_info):
         """Enhanced video analysis with contextual AI metadata"""
@@ -630,7 +617,7 @@ class YouTubeShortsGenerator:
                 "hashtags": ai_hashtags,
                 "quality_score": quality_score,
                 "engagement_score": round(quality_score * 10 + random.uniform(0, 5), 1),
-                "virality_petential": f"{min(95, int(quality_score * 10))}%",
+                "virality_potential": f"{min(95, int(quality_score * 10))}%",
                 "category": category,
                 "copyright_status": copyright_analysis['status'],
                 "copyright_score": copyright_analysis['score'],
@@ -670,57 +657,6 @@ class YouTubeShortsGenerator:
             timestamps.append(int(timestamp))
         
         return timestamps
-    
-    def create_short_video(self, input_path, start_time, duration, output_path):
-        """Create HIGH QUALITY short video in vertical format"""
-        if not self.ffmpeg_path:
-            return False
-        
-        try:
-            print(f"🎬 Creating {duration}-second vertical short...")
-            
-            if not os.path.exists(input_path):
-                return False
-            
-            # HIGH QUALITY FFmpeg command
-            cmd = [
-                self.ffmpeg_path,
-                '-ss', str(start_time),
-                '-i', input_path,
-                '-t', str(duration),
-                '-c:v', 'libx264',
-                '-crf', '23',
-                '-preset', 'medium',
-                '-c:a', 'aac',
-                '-b:a', '192k',
-                '-vf', 'scale=1080:1920:force_original_aspect_ratio=decrease:flags=lanczos,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black',
-                '-movflags', '+faststart',
-                '-pix_fmt', 'yuv420p',
-                '-y',
-                output_path
-            ]
-            
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
-            
-            if result.returncode == 0 and os.path.exists(output_path):
-                output_size = os.path.getsize(output_path)
-                if output_size > 1024 * 1024:
-                    return True
-            
-            return False
-                
-        except Exception as e:
-            print(f"❌ Video creation error: {e}")
-            return False
-
-    def sanitize_filename(self, filename):
-        """Sanitize filename for safe file system use"""
-        # Remove or replace invalid characters
-        sanitized = re.sub(r'[<>:"/\\|?*]', '', filename)
-        # Replace multiple spaces with single space
-        sanitized = re.sub(r'\s+', ' ', sanitized)
-        # Trim to reasonable length
-        return sanitized.strip()[:100]
 
 # Initialize the generator
 shorts_generator = YouTubeShortsGenerator()
@@ -1046,7 +982,7 @@ if __name__ == '__main__':
     print("🚀 YouTube Shorts Pro Server Starting...")
     print("🎯 CONTEXTUAL AI TITLE GENERATION ENABLED")
     print("💾 PERSISTENT SESSION MANAGEMENT ENABLED")
-    print("🛡️  YOUTUBE BOT PROTECTION BYPASS ENABLED")
+    print("🔑 YOUTUBE API INTEGRATION ACTIVE")
     
     # Clean up any expired sessions on startup
     session_manager.cleanup_expired_sessions()
